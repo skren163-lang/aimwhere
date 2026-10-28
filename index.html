@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aimware - Official Client & Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0f1218;
+            color: #e1e7ef;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Сайдбар */
+        .sidebar {
+            width: 240px;
+            background-color: #141820;
+            border-right: 1px solid #222b3b;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 25px 15px;
+        }
+        .logo-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-area h2 {
+            color: #ff4724;
+            font-size: 22px;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: #8b9bb4;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            background-color: #1c2433;
+            color: #ffffff;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background-color: #181f2c;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .user-profile:hover {
+            background-color: #20293a;
+        }
+        .user-avatar-img {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ff4724;
+        }
+        /* Основной контент */
+        .content {
+            flex: 1;
+            padding: 35px 40px;
+            overflow-y: auto;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .btn-download-loader {
+            background: linear-gradient(135deg, #ff4724, #d03010);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 71, 36, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-download-loader:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 71, 36, 0.45);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+        .subtitle {
+            color: #72849e;
+            margin-bottom: 25px;
+        }
+        /* Карточки */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: #161c27;
+            border: 1px solid #232e42;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: #ff4724;
+        }
+        .card h3 {
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .card p {
+            color: #8b9bb4;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .btn-action {
+            background-color: #ff4724;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.2s;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-action:hover {
+            background-color: #e03b1b;
+        }
+        /* Формы */
+        .form-box {
+            max-width: 520px;
+            background: #161c27;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #232e42;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #8b9bb4;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: #0f1218;
+            border: 1px solid #232e42;
+            border-radius: 6px;
+            color: white;
+        }
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #161c27;
+            border: 1px solid #232e42;
+            padding: 25px;
+            border-radius: 10px;
+            width: 360px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Сайдбар -->
+    <div class="sidebar">
+        <div>
+            <div class="logo-area">
+                <h2>AIMWARE</h2>
+            </div>
+            <div class="nav-links">
+                <button class="nav-btn active" onclick="switchTab('subscriptions', event)">Subscriptions</button>
+                <button class="nav-btn" onclick="switchTab('website', event)">Website / News</button>
+                <button class="nav-btn" onclick="switchTab('support', event)">Support</button>
+                <button class="nav-btn" onclick="switchTab('market', event)">Market</button>
+            </div>
+        </div>
+        
+        <!-- Профиль -->
+        <div class="user-profile" onclick="openProfileModal()">
+            <img id="profile-avatar" src="about_avatar.jpg" class="user-avatar-img" alt="Avatar">
+            <div>
+                <div id="profile-name" style="font-size: 14px; font-weight: 600;">Arseny</div>
+                <div style="font-size: 12px; color: #ff4724;">Lifetime Member</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Контент -->
+    <div class="content">
+
+        <!-- Шапка с кнопкой скачивания лоудера из папки aimwhere -->
+        <div class="header-top">
+            <div></div>
+            <a href="Aimware.exe" download="Aimware_Loader.exe" class="btn-download-loader">⬇ Download Loader (.exe)</a>
+        </div>
+
+        <!-- Subscriptions -->
+        <div id="subscriptions" class="tab-content active">
+            <h1>Subscriptions</h1>
+            <p class="subtitle">Управление активными продуктами</p>
+            <div class="grid-container">
+                <div class="card">
+                    <h3>Counter-Strike 2</h3>
+                    <p>Статус: <b>Expires in: Lifetime</b></p>
+                    <button class="btn-action" onclick="alert('Лоудер подготавливает инъекцию...')">Launch Client</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- News -->
+        <div id="website" class="tab-content">
+            <h1>News & Updates</h1>
+            <p class="subtitle">Последние обновления проекта</p>
+            <div class="card">
+                <h3>CS2 Security Update</h3>
+                <p>Все функции оптимизированы под свежий патч Counter-Strike 2.</p>
+            </div>
+        </div>
+
+        <!-- Support -->
+        <div id="support" class="tab-content">
+            <h1>Customer Support</h1>
+            <p class="subtitle">Служба поддержки пользователей</p>
+            <div class="form-box">
+                <div class="form-group">
+                    <label>Тема обращения</label>
+                    <input type="text" placeholder="Укажите тему">
+                </div>
+                <div class="form-group">
+                    <label>Описание проблемы</label>
+                    <textarea placeholder="Опишите подробности..."></textarea>
+                </div>
+                <button class="btn-action" onclick="alert('Тикет отправлен!')">Отправить тикет</button>
+            </div>
+        </div>
+
+        <!-- Market -->
+        <div id="market" class="tab-content">
+            <h1>Community Market</h1>
+            <p class="subtitle">Загружайте свои конфиги или скачивайте работы других игроков</p>
+
+            <!-- Форма загрузки своего конфига -->
+            <div class="form-box">
+                <h3 style="margin-bottom: 12px;">Загрузить свой конфиг</h3>
+                <div class="form-group">
+                    <label>Название конфига</label>
+                    <input type="text" id="cfg-title" placeholder="Например: My Best HVH Config">
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <input type="text" id="cfg-desc" placeholder="Короткое описание настроек">
+                </div>
+                <div class="form-group">
+                    <label>Файл конфига (.json / .cfg)</label>
+                    <input type="file" id="cfg-file" accept=".json,.cfg,.txt">
+                </div>
+                <button class="btn-action" onclick="uploadConfig()">Опубликовать в Market</button>
+            </div>
+
+            <h3 style="margin-bottom: 15px;">Доступные конфигурации</h3>
+            <div class="grid-container" id="market-list">
+                <div class="card">
+                    <h3>Legit Config by Pro</h3>
+                    <p>Плавный леджит для соревновательной игры.</p>
+                    <a href="#" class="btn-action" onclick="alert('Это встроенный пример конфига.')">Download CFG</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Модальное окно смены ника и аватарки -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 15px; color: white;">Редактировать профиль</h3>
+            <div class="form-group">
+                <label>Ваш никнейм</label>
+                <input type="text" id="input-username" value="Arseny">
+            </div>
+            <div class="form-group">
+                <label>Новая аватарка</label>
+                <input type="file" id="input-avatar" accept="image/*">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn-action" onclick="saveProfile()">Сохранить</button>
+                <button class="btn-action" style="background: #232e42;" onclick="closeProfileModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Переключение вкладок
+        function switchTab(tabId, event) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Модальное окно профиля
+        function openProfileModal() {
+            document.getElementById('profileModal').style.display = 'flex';
+        }
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+        }
+
+        // Сохранение ника и аватарки
+        function saveProfile() {
+            const newName = document.getElementById('input-username').value;
+            if (newName.trim() !== '') {
+                document.getElementById('profile-name').innerText = newName;
+            }
+
+            const avatarFile = document.getElementById('input-avatar').files[0];
+            if (avatarFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profile-avatar').src = e.target.result;
+                };
+                reader.readAsDataURL(avatarFile);
+            }
+            closeProfileModal();
+        }
+
+        // Публикация и реальное скачивание конфигов
+        function uploadConfig() {
+            const titleInput = document.getElementById('cfg-title');
+            const descInput = document.getElementById('cfg-desc');
+            const fileInput = document.getElementById('cfg-file');
+
+            const title = titleInput.value.trim();
+            const desc = descInput.value.trim();
+            const file = fileInput.files[0];
+
+            if (!title || !desc || !file) {
+                alert('Пожалуйста, заполните название, описание и выберите файл конфига!');
+                return;
+            }
+
+            const fileUrl = URL.createObjectURL(file);
+
+            const marketList = document.getElementById('market-list');
+            const newCard = document.createElement('div');
+            newCard.className = 'card';
+            newCard.innerHTML = `
+                <h3>${title}</h3>
+                <p>${desc}</p>
+                <p style="font-size: 12px; color: #ff4724; margin-bottom: 10px;">Файл: ${file.name}</p>
+                <a href="${fileUrl}" download="${file.name}" class="btn-action">Download CFG</a>
+            `;
+
+            marketList.prepend(newCard);
+
+            titleInput.value = '';
+            descInput.value = '';
+            fileInput.value = '';
+
+            alert('Ваш конфиг успешно опубликован и доступен для скачивания!');
+        }
+    </script>
+</body>
+</html>
